@@ -1,0 +1,49 @@
+﻿@page "/Calendar"
+@using System.ComponentModel
+@using Syncfusion.EJ2.Blazor
+@using Syncfusion.EJ2.Blazor.Schedule
+@using Syncfusion.EJ2.Blazor.SplitButtons
+@using Syncfusion.EJ2.Blazor.Calendars
+@using MediaCalendar.Containers
+@inherits CalendarBase
+
+<h1>Media Calender!</h1>
+
+@if (loaded == false)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        Movie name: <input type="text" style="margin-left:4px" id="movieName" name="movieName" @bind="movieName" /><br>
+    </div>
+
+    <button class="btn btn-primary" @onclick="AddMovie">Add movie</button>
+    <p>@((MarkupString)addMovieResultString)</p>
+
+    <div>
+        Series name: <input type="text" style="margin-left:2px" id="seriesName" name="seriesName" @bind="seriesName" /><br>
+    </div>
+
+    <button class="btn btn-primary" @onclick="AddSeries">Add series</button>
+    <p>@((MarkupString)addSeriesResultString)</p>
+
+    <p>Number: @EpNum</p>
+    <button class="btn btn-primary" @onclick="UpdateSchedule">Update Calendar</button>
+    <button class="btn btn-primary" @onclick="ClearDatabase">Clear database</button>
+    <p>@((MarkupString)clearDatabaseResultString)</p>
+
+    @*<EjsSchedule TValue=object></EjsSchedule>*@
+
+
+    <EjsSchedule @ref="ScheduleObj"
+                     TValue="AppointmentData"
+                     Height=700px
+                     Width="auto"
+                     CurrentView="View.Month"
+                     FirstDayOfWeek=1
+                     RowAutoHeight="true">
+            <ScheduleEventSettings DataSource="@DataSource"></ScheduleEventSettings>
+        </EjsSchedule>
+}
