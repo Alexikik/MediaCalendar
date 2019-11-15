@@ -44,14 +44,6 @@ namespace MediaCalendar
                 ctx.Database.EnsureCreated();
                 //ctx.Database.Migrate();
 
-
-                //MediaCalendar.Data.Media.Episode episodeTest = new MediaCalendar.Data.Media.Episode() { seriesId = 75, SeriesName = "test" };
-                //MediaCalendar.Data.Media.Series seriesTest = new MediaCalendar.Data.Media.Series() { seriesId = "75", seriesName = "test", episodes = new List<MediaCalendar.Data.Media.Episode>() { episodeTest } };
-                ////seriesTest.episodes.Add(episodeTest);
-
-                ////ctx.Add(new MediaCalender.Shared.User() { Username = ".", Password = "." });
-                //ctx.Add(seriesTest);
-                //ctx.Add(episodeTest);
                 ctx.SaveChanges();
             }
         }
