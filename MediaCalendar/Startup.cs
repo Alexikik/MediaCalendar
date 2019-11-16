@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MediaCalendar.Areas.Identity;
 using MediaCalendar.Data;
+using MediaCalendar.Users;
 
 namespace MediaCalendar
 {
@@ -38,15 +39,19 @@ namespace MediaCalendar
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=LoginDatabase.sqlite"));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddDefaultIdentity<IdentityUser>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddDefaultIdentity<ApplicationUser>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultUI().AddClaimsPrincipalFactory<MyUserClaimsPrincipalFactory>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<SeriesLibary>();
             services.AddScoped<MovieLibary>();
             services.AddSingleton<GetImdbSeries>();
+            //services.AddSingleton<UserManager<IdentityUser>>();
             services.AddDbContext<Database>(options =>
             {
                 //options.UseSqlite(Configuration.GetConnectionString("DatabaseFile"));

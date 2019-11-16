@@ -18,6 +18,8 @@ namespace MediaCalendar.Pages
         [Inject]
         protected SeriesLibary SeriesLibary { set; get; }
         [Inject]
+        protected ApplicationDbContext ApplicationDbContext { set; get; }
+        [Inject]
         protected Database Database { set; get; }
         public List<AppointmentData> DataSource = new List<AppointmentData>();
         public StringContainer movieString;
@@ -39,6 +41,7 @@ namespace MediaCalendar.Pages
         {
             await GetAllEpisodes();
             loaded = true;
+            seriesName = ApplicationDbContext.Users.ToList().First().Email;
         }
 
         public void AddMovie()

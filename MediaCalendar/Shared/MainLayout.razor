@@ -1,5 +1,15 @@
 ﻿@inherits LayoutComponentBase
 
+@inject NavigationManager navigationManager
+
+@using Microsoft.AspNetCore.Identity
+@using MediaCalendar.Users
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+
 <div class="sidebar">
     <NavMenu />
 </div>
@@ -7,7 +17,6 @@
 <div class="main">
     <div class="top-row px-4">
         <LoginDisplay />
-        <a href="https://docs.microsoft.com/en-us/aspnet/" target="_blank">About</a>
     </div>
 
     <div class="content px-4">
