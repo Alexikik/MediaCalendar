@@ -34,9 +34,6 @@ else
     <button class="btn btn-primary" @onclick="ClearDatabase">Clear database</button>
     <p>@((MarkupString)clearDatabaseResultString)</p>
 
-    @*<EjsSchedule TValue=object></EjsSchedule>*@
-
-
     <EjsSchedule @ref="ScheduleObj"
                      TValue="AppointmentData"
                      Height=700px

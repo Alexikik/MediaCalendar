@@ -68,6 +68,8 @@ namespace MediaCalendar.Pages
             if (answer.result)
             {
                 addSeriesResultString = $"{seriesName} added to followed media";
+                await UpdateSchedule();
+                seriesName = "";
             }
             else
                 addSeriesResultString = $"{seriesName} could not be added <br />{answer.errorMessage}";
@@ -145,9 +147,8 @@ namespace MediaCalendar.Pages
         }
         public async Task UpdateSchedule()
         {
-            Task task = GetAllEpisodes();
             DataSource.Clear();
-            await task;
+            await GetAllEpisodes();
             ScheduleObj.Refresh();
         }
     }
