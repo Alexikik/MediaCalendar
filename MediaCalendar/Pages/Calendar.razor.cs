@@ -100,7 +100,7 @@ namespace MediaCalendar.Pages
         public void GetAllEpisodes()
         {
             List<Episode> episodeList = new List<Episode>();
-            episodeList = Database.EpisodeLibary.Where(e => e.firstAired > DateTime.Now.AddMonths(-1)).ToList();
+            episodeList = Database.EpisodeLibary.Where(e => e.firstAired > DateTime.Now.AddMonths(-2).AddDays(-DateTime.Now.Day)).ToList();
 
             foreach (Episode episode in episodeList)
             {
