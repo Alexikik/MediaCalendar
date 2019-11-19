@@ -22,7 +22,7 @@ namespace MediaCalendar.Pages
         public List<AppointmentData> DataSource = new List<AppointmentData>();
         public StringContainer movieString;
         public EjsSchedule<AppointmentData> ScheduleObj;
-        public string movieName, seriesName, addMovieResultString, addSeriesResultString, EpNum, clearDatabaseResultString;
+        public string movieName, seriesName, seriesImdbId, addMovieResultString, addSeriesResultString, EpNum, clearDatabaseResultString, updatingEpisodes;
         public bool loaded = false, loginStatus;
 
         #region Calendar things
@@ -37,8 +37,7 @@ namespace MediaCalendar.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await GetAllEpisodes();
-            loaded = true;
+            GetAllEpisodes();
         }
 
         public void AddMovie()
@@ -55,27 +54,50 @@ namespace MediaCalendar.Pages
                 addMovieResultString = $"{movieName} could not be added <br />{answer.errorMessage}";
         }
 
-        public async Task AddSeries()
+        public async Task AddSeriesViaName()
         {
-            // Sends movie name to be added and retrieves bool about succesfulness
-            Task<ResultContainer> taskAnswer = SeriesLibary.AddSeries(seriesName, Database);
+            int seriesId;
 
             addSeriesResultString = "Adding series in progress";
+
+            seriesId = await SeriesLibary.searchForSeriesViaName(seriesName);                   // Gets series id
+
+            await AddSeries(seriesId);
+        }
+
+        public async Task AddSeriesViaID()
+        {
+            int seriesId;
+
+            addSeriesResultString = "Adding series in progress";
+
+            seriesId = await SeriesLibary.searchForSeriesViaImdbId(seriesImdbId);    // Gets series id
+
+            await AddSeries(seriesId);
+        }
+        private async Task AddSeries(int seriesId)
+        {
+            // Sends movie name to be added and retrieves bool about succesfulness
+            Task<ResultContainer> taskAnswer = SeriesLibary.AddSeries(seriesId);
 
             ResultContainer answer = await taskAnswer;
 
             // Process depending on result
             if (answer.result)
             {
-                addSeriesResultString = $"{seriesName} added to followed media";
-                await UpdateSchedule();
+                if (seriesName != "")
+                    addSeriesResultString = $"{seriesName} added to followed media";
+                else
+                    addSeriesResultString = $"{seriesImdbId} added to followed media";
+                UpdateSchedule();
                 seriesName = "";
+                seriesImdbId = "";
             }
             else
                 addSeriesResultString = $"{seriesName} could not be added <br />{answer.errorMessage}";
         }
 
-        public async Task GetAllEpisodes()
+        public void GetAllEpisodes()
         {
             List<Episode> episodeList = new List<Episode>();
             episodeList = Database.EpisodeLibary.Where(e => e.firstAired > DateTime.Now.AddMonths(-1)).ToList();
@@ -145,11 +167,19 @@ namespace MediaCalendar.Pages
             else
                 clearDatabaseResultString = $"Database could not be cleared <br />{answer.errorMessage}";
         }
-        public async Task UpdateSchedule()
+        public void UpdateSchedule()
         {
             DataSource.Clear();
-            await GetAllEpisodes();
+            GetAllEpisodes();
             ScheduleObj.Refresh();
+        }
+
+        public async Task UpdateAllSeriesInDB()
+        {
+            updatingEpisodes = "Updating episodes";
+            await SeriesLibary.UpdateAllSeriesInDB();
+            updatingEpisodes = "Done Updating";
+            UpdateSchedule();
         }
     }
 }

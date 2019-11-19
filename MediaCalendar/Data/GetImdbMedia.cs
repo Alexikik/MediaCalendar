@@ -249,6 +249,36 @@ namespace MediaCalendar.Data
                 return seachResult.data[0].id;
             }
         }
+        internal async Task<int> SearchForSeriesViaImdbId(string seriesImdbId)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                // Url to TVDB
+                Uri url = new Uri($"https://api.thetvdb.com/search/series?imdbId={seriesImdbId}");
+
+                // Set Accept request header
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Token.token);
+
+                // Setup request message with json apikey and content-type header
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                // Send via post, get response, read content into string, check to be sure it was OK
+                HttpResponseMessage resp = await client.SendAsync(request);
+                var respString = await resp.Content.ReadAsStringAsync();
+                if (resp.ReasonPhrase != "OK")
+                {
+                    return -1;
+                    throw new Exception(resp.ReasonPhrase);
+                }
+
+                // Deserialize string into token
+                SeachResult seachResult = new SeachResult();
+                seachResult = JsonConvert.DeserializeObject<SeachResult>(respString);
+
+                return seachResult.data[0].id;
+            }
+        }
         public async Task<Episode> getEpisode(string EpisodeName)
         {
             using (HttpClient client = new HttpClient())
@@ -281,5 +311,6 @@ namespace MediaCalendar.Data
                 return episode;
             }
         }
+
     }
 }

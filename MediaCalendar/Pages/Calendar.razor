@@ -7,7 +7,7 @@
 @using MediaCalendar.Containers
 @inherits CalendarBase
 
-<h1>Media Calender!</h1>
+<h1>Media Calendar!</h1>
 
 @if (loaded == false)
 {
@@ -23,24 +23,28 @@ else
     <p>@((MarkupString)addMovieResultString)</p>
 
     <div>
-        Series name: <input type="text" style="margin-left:2px" id="seriesName" name="seriesName" @bind="seriesName" /><br>
+        Series name: <input type="text" style="margin-left:2px" id="seriesName" name="seriesName" @bind="seriesName" />
+        Series IMDB id: <input type="text" style="margin-left:2px" id="seriesImdbId" name="seriesImdbId" @bind="seriesImdbId" /><br>
     </div>
 
-    <button class="btn btn-primary" @onclick="AddSeries">Add series</button>
+    <button class="btn btn-primary" @onclick="AddSeriesViaName">Add series</button>
+    <button class="btn btn-primary" @onclick="AddSeriesViaID">Add series via id</button>
     <p>@((MarkupString)addSeriesResultString)</p>
 
     <p>Number: @EpNum</p>
     <button class="btn btn-primary" @onclick="UpdateSchedule">Update Calendar</button>
     <button class="btn btn-primary" @onclick="ClearDatabase">Clear database</button>
+    <button class="btn btn-primary" @onclick="UpdateAllSeriesInDB">Update all series</button>
     <p>@((MarkupString)clearDatabaseResultString)</p>
+    <p>@((MarkupString)updatingEpisodes)</p>
 
     <EjsSchedule @ref="ScheduleObj"
-                     TValue="AppointmentData"
-                     Height=700px
-                     Width="auto"
-                     CurrentView="View.Month"
-                     FirstDayOfWeek=1
-                     RowAutoHeight="true">
-            <ScheduleEventSettings DataSource="@DataSource"></ScheduleEventSettings>
-        </EjsSchedule>
+                 TValue="AppointmentData"
+                 Height=700px
+                 Width="auto"
+                 CurrentView="View.Month"
+                 FirstDayOfWeek=1
+                 RowAutoHeight="true">
+        <ScheduleEventSettings DataSource="@DataSource"></ScheduleEventSettings>
+    </EjsSchedule>
 }

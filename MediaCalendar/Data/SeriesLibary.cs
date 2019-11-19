@@ -21,22 +21,22 @@ namespace MediaCalendar.Data
             this.getImdbSeries = GetImdbSeries;
         }
 
-        public async Task<ResultContainer> AddSeries(string seriesName, Database database)
+        public async Task<ResultContainer> AddSeries(int seriesId)
         {
             Series series;
             ResultContainer result = new ResultContainer();
             //GetImdbSeries getter = new GetImdbSeries();
             GetImdbSeries getter = getImdbSeries;
-            int seriesId;
+            //int seriesId;
 
             // Searches API for seriesID
-            seriesId = await getImdbSeries.SearchForSeries(seriesName);
-            if (seriesId == -1)
-            {
-                result.result = false;
-                result.errorMessage = "Series not found";
-                return result;
-            }
+            //seriesId = await getImdbSeries.SearchForSeries(seriesName); // change
+            //if (seriesId == -1)
+            //{
+            //    result.result = false;
+            //    result.errorMessage = "Series not found";
+            //    return result;
+            //}
 
             // Check if it's already added
             if (CheckIfSeriesIsInDB(seriesId))
@@ -63,18 +63,36 @@ namespace MediaCalendar.Data
             return result;
         }
 
+        public async Task<int> searchForSeriesViaName(string seriesName)
+        {
+            int seriesId;
+
+            // Searches API for seriesID
+            seriesId = await getImdbSeries.SearchForSeries(seriesName);
+
+            return seriesId;
+        }
+        public async Task<int> searchForSeriesViaImdbId(string seriesImdbId)
+        {
+            int seriesId;
+
+            // Searches API for seriesID
+            seriesId = await getImdbSeries.SearchForSeriesViaImdbId(seriesImdbId);
+
+            return seriesId;
+        }
+
         private async Task<ResultContainer> addAllSeriesEpisodes(Series series)
         {
             ResultContainer result = new ResultContainer();
 
             // Adds series to database
-            List<Episode> episodes = await AddSeason(series.id, database);
+            List<Episode> episodes = await AddSeason(series);
             series.episodes = episodes;
 
             database.Add(series);
             foreach (Episode episode in episodes)
             {
-                episode.SeriesName = series.seriesName;
                 if (episode.firstAired != new DateTime(0001, 1, 1))
                 {
                     database.Add(episode);
@@ -86,19 +104,21 @@ namespace MediaCalendar.Data
             return result;
         }
 
-        private async Task<List<Episode>> AddSeason(int seriesId, Database database)
+        private async Task<List<Episode>> AddSeason(Series series)
         {
             List<Episode> episodes;
             ResultContainer result = new ResultContainer();
 
-            episodes = await getImdbSeries.getEpisodeList(seriesId);
+            episodes = await getImdbSeries.getEpisodeList(series.id);
 
-            if (episodes.Count == 0)
-            {
-                result.result = false;
-                result.errorMessage = "No episodes found [Database.cs]";
-                //return result;
-            }
+            foreach (Episode episode in episodes)
+                episode.SeriesName = series.seriesName;
+            //if (episodes.Count == 0)
+            //{
+            //    result.result = false;
+            //    result.errorMessage = "No episodes found [Database.cs]";
+            //    //return result;
+            //}
 
             //result.result = true;
             return episodes;
@@ -122,6 +142,29 @@ namespace MediaCalendar.Data
 
 
             return new ResultContainer();
+        }
+
+        internal async Task UpdateAllSeriesInDB()
+        {
+            List<Series> seriesList = database.SeriesLibary.Include(s => s.episodes).ToList();
+
+            foreach (Series series in seriesList)
+            {
+                List<Episode> episodes = new List<Episode>();
+                episodes = await AddSeason(series);
+
+                if (series.episodes.Count != episodes.Count)
+                {
+                    foreach (Episode ep in series.episodes)     // Removes old episodes
+                        database.Remove(ep);
+                    series.episodes.Clear();                    // Clears episodes from series
+                    foreach (Episode episode in episodes)       // Adds new episodes to series
+                        series.episodes.Add(episode);
+                    foreach (Episode episode in episodes)       // Adds new episodes to database
+                        database.Add(episode);
+                    database.SaveChanges();
+                }
+            }
         }
     }
 }
