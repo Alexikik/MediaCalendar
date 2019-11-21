@@ -147,7 +147,7 @@ namespace MediaCalendar.Data
         internal async Task UpdateAllSeriesInDB()
         {
             List<Series> seriesList = database.SeriesLibary.Include(s => s.episodes).ToList();
-
+            
             foreach (Series series in seriesList)
             {
                 List<Episode> episodes = new List<Episode>();
