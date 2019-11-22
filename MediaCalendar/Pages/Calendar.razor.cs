@@ -8,11 +8,23 @@ using Syncfusion.EJ2.Blazor;
 using Syncfusion.EJ2.Blazor.Schedule;
 using MediaCalendar.Data;
 using MediaCalendar.Data.Media;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using MediaCalendar.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MediaCalendar.Pages
 {
+    [Authorize]
     public class CalendarBase : ComponentBase
     {
+        #region Login
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        [Inject]
+        protected SignInManager<ApplicationUser> SignInManager { get; set; }
+        private int userId { get; set; }
+        #endregion Login
         [Inject]
         protected MovieLibary MovieLibary { set; get; }
         [Inject]
@@ -37,7 +49,25 @@ namespace MediaCalendar.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            //Task<AuthenticationState> task = authenticationStateTask;
+            
             GetAllEpisodes();
+
+            //var authState = await task;
+            //var user = authState.User;
+
+            //if (SignInManager.IsSignedIn(user))
+            //{
+            //    userId = int.Parse(user.FindFirst("Id").Value);
+            //}
+
+            var authState = await authenticationStateTask;
+            var user = authState.User;
+
+            if (SignInManager.IsSignedIn(user))
+            {
+                //userId = int.Parse(user.FindFirst("Id").Value);
+            }
         }
 
         public void AddMovie()

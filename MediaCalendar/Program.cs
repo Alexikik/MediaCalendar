@@ -20,6 +20,7 @@ namespace MediaCalendar
         public static void Main(string[] args)
         {
             EnsureDbCreated(false);
+            EnsureLoginDbCreated(true);
 
             //GetImdbSeries getter = new GetImdbSeries();
             //Task<Episode> TEp = getter.getEpisode("Hejsa");
@@ -38,6 +39,19 @@ namespace MediaCalendar
         private static void EnsureDbCreated(bool reset = false)
         {
             using (Database ctx = new Database())
+            {
+                if (reset)
+                    ctx.Database.EnsureDeleted();
+                ctx.Database.EnsureCreated();
+                //ctx.Database.Migrate();
+
+                ctx.SaveChanges();
+            }
+        }
+
+        private static void EnsureLoginDbCreated(bool reset = false)
+        {
+            using (ApplicationDbContext ctx = new ApplicationDbContext())
             {
                 if (reset)
                     ctx.Database.EnsureDeleted();
